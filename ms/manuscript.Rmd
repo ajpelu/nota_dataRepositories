@@ -1,7 +1,7 @@
 ---
-title: "A note on something \n"
+title: "Compartiendo datos en Ecología: como añadir (¿más?) valor a tus datos"
   
-author: Author One^1^, Author Two^1^
+author: Antonio Jesús Pérez-Luque^1^, Andrea Ros Candeira^1^, Francisco Rodríguez-Sánchez^2^ 
   
 output:
   word_document:
@@ -10,27 +10,29 @@ output:
     fig_width: 7.5
     highlight: null
     reference_docx: Ecosistemas_template.docx
-    
 csl: ecosistemas.csl
 bibliography: 
   - references.bib
-  - knitcitations.bib
+editor_options: 
+  chunk_output_type: console
 ---
 
 
-> (1) Departmento de Ecología ....
+> (1) Laboratorio de Ecología, Instituto Interuniversitario de Investigación del Sistema Tierra (IISTA-CEAMA), Universidad de Granada, Avda. del Mediterráneo s/n, Granada 18006, España.
 
-> Autor para correspondencia: Author One [author@gmail.com]
+> (2) COMPLETAR 
+
+> Autor para correspondencia: A. J. Pérez-Luque [ajperez@ugr.es]
 
 
 # Palabras clave
 
-> keyword1; keyword2; keyword3; keyword4
+> publicación de datos; repositorios de datos; data papers; metadatos
 
 
 # Keywords
 
-> keyword1; keyword2; keyword3; keyword4
+> data publishing; data repository; data papers; metadata
 
 
 ```{r knitcitations, echo=FALSE, cache = FALSE}
@@ -39,9 +41,23 @@ cleanbib()
 cite_options(citation_format = "pandoc")
 ```
 
-Esta es una plantilla para escribir [Notas Ecoinformáticas](https://github.com/ecoinfAEET/Notas_Ecosistemas) en formato Rmarkdown para la revista [Ecosistemas](www.revistaecosistemas.net). Para saber más sobre Rmarkdown, visite http://rmarkdown.rstudio.com. Para ver un ejemplo de manuscrito escrito íntegramente en Rmarkdown, visite https://github.com/ecoinfAEET/Reproducibilidad/blob/master/Repro_ms.Rmd.
 
-Hay varias formas de citar bibliografía (véase http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html). Una de ellas requiere simplemente adjuntar un fichero BibTex con todas las referencias, y citar cada una de ellas usando su 'CitationKey' [e.g. @Yan2011; @Sutherland2011]. También pueden utilizarse paquetes como [knitcitations](https://cran.r-project.org/web/packages/knitcitations/index.html) o [RefManageR](https://cran.r-project.org/web/packages/RefManageR/index.html) para obtener automáticamente la información bibliográfica de internet. Por ejemplo, para citar un artículo es tan fácil como escribir su DOI `r citep("10.1016/j.tree.2006.03.016")` o incluso solo algunas palabras claves `r citep("Ricklefs 2008 American Naturalist")`. Estos artículos aparecerán automágicamente en la lista de referencias citadas. 
+IDEAS:
+
+* Importancia de depositar los datos en repositorios institucionales o reconocidos por la comunidad científica
+* Añadir valor añadido a los conjuntos de datos con la documentación de los mismos (metadatado) y la creación de DataPapers
+* Enumerar algunas de las principales herramientas / plataformas / etc para documentación y depósito de datos y metadatos
+* Inclusión de esta filosofía dentro del ciclo de Reproducibilidad en Ciencia
+* Mostrar un caso de ejemplo con SINFONEVADA 
+ 
+
+Existen muchos repositorios de datos [@Yan2011]. 
+
+
+
+Un ejemplo. 
+
+
 
 ## Como incluir ejemplos
 
@@ -87,7 +103,206 @@ Texto.
 
 # Discusión
 
-Texto.
+
+
+## Ejemplo SINFONEVADA
+
+
+
+
+
+Las plantaciones de pinares presentan menor riqueza de especies y menor diversidad de especies que los bosques naturales de encinar y robledal. Esto se debe, en ambas variables, al menor múmero de especies herbáceas presentes en las plantaciones de pinar [@GomezAparicio2009].  
+
+
+
+
+
+Para establecer los valores iniciales de riqueza en cada uno de los tipos de cobertura vegetal vamos a analizar los datos de campo procedentes de los inventarios forestales SINFONEVADA [@PerezLuque2014]. Para ello consultaremos este [conjunto de datos](http://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472) en GBIF donde está documentado. 
+
+El objetivo es ***obtener una tabla de riqueza por ecosistema***. Los pasos que realizaremos son: 
+
+* Estudiar el conjunto de datos. Consultar el identificador único (`uuid`) del dataset: `db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472` 
+* Descargar el dataset 
+* Obtener los valores de riqueza por ecosistema. Para ello utilizaremos el mapa de ecosistemas generado por el [Observatorio de Cambio Global de Sierra Nevada](www.obsnev.es) [@Bonet2010] 
+
+
+
+
+### Obtener el conjunto de datos 
+
+```{r} 
+library("knitcitations")
+library("rgbif")
+library("rgdal")
+library("sp")
+library("raster")
+library("dplyr")
+library("sf")
+library("knitr")
+```
+
+En primer lugar tenemos que conocer el identificador único del conjunto de datos (UUID, *Universally Unique IDentifier*). En este caso, los datos se encuentran en alojados en GBIF, y se corresponde con el Data-Set key "db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472", que se puede obtener de la pagina web del recurso de datos [https://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472](https://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472). 
+
+Seguidamente obtenemos el conjunto de datos y sus metadatos, que coinciden con los metadatos incluidos en el repositorio donde se alojan los datos. 
+
+```{r}
+### UUID del conjunto de datos 
+sinfo_uuid <- 'db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472'
+
+## Metadatos 
+sinfo_meta <- datasets(uuid = sinfo_uuid)
+```
+
+Este conjunto de datos contiene un total de `r occ_count(datasetKey=sinfo_uuid)` ocurrencias, que podemos obtener escribiendo 
+
+```{r}
+occ_count(datasetKey=sinfo_uuid)
+```
+
+
+Y seguidamente vamos a conseguir una tabla que contenga todas las ocurrencias del conjunto de datos
+
+```{r}
+sinfonevada <- occ_data(datasetKey=sinfo_meta$data$key, limit = 8000)
+```
+
+
+
+### Numero de plots y especies por plot
+
+* Obtendremos el numero de plots (agrupando por localización) 
+* Para cada plot calcularemos la riqueza de especies 
+
+
+```{r, eval=FALSE}
+# Get only the fields of interest  
+df <- sf$data %>% dplyr::select(decimalLatitude, decimalLongitude, scientificName)
+
+# How many species by plot
+richness_loc <- df %>%
+  group_by(decimalLatitude, decimalLongitude) %>% 
+  count() %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column(var='id_plot') %>%
+  rename(rich = n)
+```
+
+### Riqueza por ecosistemas 
+
+* Analizaremos la riqueza media de los plots por ecosistema
+* Obtener los ecosistemas de OBSNEV, que están en este [enlace](https://www.dropbox.com/s/urcbafyczvqv7o1/ecosistemas_sn.zip?dl=0). También se han incluido en la carpeta `/data` del paquete. 
+
+
+```{r, eval=FALSE}
+# Prepare Ecosystems data 
+wd <- getwd()
+
+temporalwd <- setwd(tempdir())
+unzip('../inst/extdata/ecosistemas_sn.zip', exdir = temporalwd)
+
+eco <- readOGR(dsn=temporalwd, layer = 'ecosistemas', encoding="UTF-8", verbose = TRUE)
+
+# Transform projection
+eco_t <- spTransform(eco, CRS("+init=epsg:4326"))
+```
+
+Ahora creamos una capa vectorial de puntos para los plots del invetnario forestal, y le asignamos su correspondiente proyección.
+
+```{r, eval=FALSE}
+# Create an spatial point dataframe for the plots 
+richness_sp <- SpatialPointsDataFrame(richness_loc[,c("decimalLongitude", "decimalLatitude")],
+                                      richness_loc)
+projection(richness_sp) <-  CRS("+init=epsg:4326")
+```
+
+Seguidamente realizamos una intersección entre capas. Estamos interesados en obtener la tipología de ecosistema para cada plot del inventario forestal. 
+
+```{r, eval=FALSE}
+# See this example
+# https://gis.stackexchange.com/questions/226035/join-spatial-point-data-with-multiple-polygon-data-using-r
+
+# Convert to sf-objects
+richness_sp.sf <- st_as_sf(richness_sp)
+eco_t.sf <- st_as_sf(eco_t)
+
+# Keep all "meuse.sf", sort by row.names(meuse.sf). Default overlay is "intersects".
+aux <- st_join(richness_sp.sf, eco_t.sf[,c('COD_ECOSIS', 'ECOSISTE_1')])
+
+# Convert back to Spatial*
+richness_sp_eco <- as(aux, "Spatial")
+```
+
+Vamos a reagrupar los ecosistemas 
+
+```{r, eval=FALSE}
+aux <- aux %>% mutate(newECO = recode_factor(COD_ECOSIS, 
+                                                    `8`="Pine plantations",
+                                                    `2`="High-mountain meadows",
+                                                    `3`="High-mountain shrubland",
+                                                    `5`="Mid-mountain shrubland",
+                                                    `1`="Pastures",
+                                                    `6`="Aquatic systems", 
+                                                    `NA`="NA", 
+                                                    .default = 'Natural Forests'))
+```
+
+
+Finalmente computamos los valores de riqueza por ecosistemas y por agregados 
+
+```{r, eval=FALSE}
+richSinfo <- aux %>%
+  group_by(ECOSISTE_1, COD_ECOSIS) %>%
+  summarise(mean = mean(rich),
+            sd = sd(rich),
+            se = sd/sqrt(length(rich)),
+            n = length(rich),
+            min = min(rich),
+            max = max(rich),
+            median = median(rich)) %>%
+    as.data.frame() %>%
+  dplyr::select(-geometry) 
+```
+
+```{r, eval=FALSE}
+richSinfo_agg <- aux %>%
+  group_by(newECO) %>%
+  summarise(mean = mean(rich),
+            sd = sd(rich),
+            se = sd/sqrt(length(rich)),
+            n = length(rich),
+            min = min(rich),
+            max = max(rich), 
+            median = median(rich)) %>%
+  as.data.frame() %>%
+  dplyr::select(-geometry) 
+
+```
+
+
+
+En [@GomezAparicio2009] se analizan el mismo dataset, y se obtienen, tras aplicar los modelos, los siguientes resultados:
+
+
+```{r, eval=FALSE}
+richPot <- data.frame(cbind(
+  eco = c('Plantations', 'Quercus ilex forests', 'Natural deciduous forests'),
+  n = c(442, 45, 26),
+  potRich = c(13.09, 14.92, 17.55),
+  lowerInterval = c(12.82, 13.72, 15.62), 
+  upperInterval = c(13.34, 16.11, 19.66)))
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -98,7 +313,10 @@ Texto.
 
 # Agradecimientos
 
-Agradecimientos.
+LIFEADAPTAMED?  
+ECOPOTENTIAL? 
+Convenio OBSNEV?
+
 
 
 
@@ -155,7 +373,6 @@ kable(head(iris))
 **Figure 1**. Figure caption.
 
 **Figure 2**. Figure caption.
-
 
 
 
