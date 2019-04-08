@@ -42,66 +42,7 @@ cite_options(citation_format = "pandoc")
 ```
 
 
-IDEAS:
 
-* Importancia de depositar los datos en repositorios institucionales o reconocidos por la comunidad científica
-* Añadir valor añadido a los conjuntos de datos con la documentación de los mismos (metadatado) y la creación de DataPapers
-* Enumerar algunas de las principales herramientas / plataformas / etc para documentación y depósito de datos y metadatos
-* Inclusión de esta filosofía dentro del ciclo de Reproducibilidad en Ciencia
-* Mostrar un caso de ejemplo con SINFONEVADA 
- 
-
-Existen muchos repositorios de datos [@Yan2011]. 
-
-
-
-Un ejemplo. 
-
-
-
-## Como incluir ejemplos
-
-```{r read_data, eval = FALSE, echo = FALSE}
-dataset <- read.csv("mydata.csv")
-```
-
-Ajustamos un modelo lineal:
-
-$$
-y_{i} = \alpha + \beta*x_{i} 
-$$
-
-```{r model, echo = FALSE, eval = FALSE}
-model <- lm(y ~ x)
-```
-
-Utilizamos R `r citep(citation())` y Rmarkdown `r citep(list(citation("knitr"), citation("rmarkdown")))` para todos nuestros análisis. Para ajustar los modelos mixtos utilizamos `lme4` `r citep(citation("lme4"))`.
-
-
-
-
-# Resultados
-
-Esta sección está dividida en subsecciones.
-
-
-## Subsección 1
-
-Los árboles de la parcela A fueron más altos que en la parcela B (altura media: `r mean(25, 31, 28)` vs `r mean(13, 19, 16)` m). Y muchos más resultados que se actualizan dinámicamente.
-
-
-## Subsección 2
-
-Texto.
-
-
-## Subsección 3
-
-Texto.
-
-
-
-# Discusión
 
 
 
@@ -141,194 +82,13 @@ library("sf")
 library("knitr")
 ```
 
-En primer lugar tenemos que conocer el identificador único del conjunto de datos (UUID, *Universally Unique IDentifier*). En este caso, los datos se encuentran en alojados en GBIF, y se corresponde con el Data-Set key "db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472", que se puede obtener de la pagina web del recurso de datos [https://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472](https://www.gbif.org/dataset/db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472). 
 
-Seguidamente obtenemos el conjunto de datos y sus metadatos, que coinciden con los metadatos incluidos en el repositorio donde se alojan los datos. 
 
-```{r}
-### UUID del conjunto de datos 
-sinfo_uuid <- 'db6cd9d7-7be5-4cd0-8b3c-fb6dd7446472'
 
-## Metadatos 
-sinfo_meta <- datasets(uuid = sinfo_uuid)
-```
 
-Este conjunto de datos contiene un total de `r occ_count(datasetKey=sinfo_uuid)` ocurrencias, que podemos obtener escribiendo 
 
-```{r}
-occ_count(datasetKey=sinfo_uuid)
-```
 
 
-Y seguidamente vamos a conseguir una tabla que contenga todas las ocurrencias del conjunto de datos
-
-```{r}
-sinfonevada <- occ_data(datasetKey=sinfo_meta$data$key, limit = 8000)
-```
-
-
-
-### Numero de plots y especies por plot
-
-* Obtendremos el numero de plots (agrupando por localización) 
-* Para cada plot calcularemos la riqueza de especies 
-
-
-```{r, eval=FALSE}
-# Get only the fields of interest  
-df <- sf$data %>% dplyr::select(decimalLatitude, decimalLongitude, scientificName)
-
-# How many species by plot
-richness_loc <- df %>%
-  group_by(decimalLatitude, decimalLongitude) %>% 
-  count() %>% 
-  as.data.frame() %>% 
-  tibble::rownames_to_column(var='id_plot') %>%
-  rename(rich = n)
-```
-
-### Riqueza por ecosistemas 
-
-* Analizaremos la riqueza media de los plots por ecosistema
-* Obtener los ecosistemas de OBSNEV, que están en este [enlace](https://www.dropbox.com/s/urcbafyczvqv7o1/ecosistemas_sn.zip?dl=0). También se han incluido en la carpeta `/data` del paquete. 
-
-
-```{r, eval=FALSE}
-# Prepare Ecosystems data 
-wd <- getwd()
-
-temporalwd <- setwd(tempdir())
-unzip('../inst/extdata/ecosistemas_sn.zip', exdir = temporalwd)
-
-eco <- readOGR(dsn=temporalwd, layer = 'ecosistemas', encoding="UTF-8", verbose = TRUE)
-
-# Transform projection
-eco_t <- spTransform(eco, CRS("+init=epsg:4326"))
-```
-
-Ahora creamos una capa vectorial de puntos para los plots del invetnario forestal, y le asignamos su correspondiente proyección.
-
-```{r, eval=FALSE}
-# Create an spatial point dataframe for the plots 
-richness_sp <- SpatialPointsDataFrame(richness_loc[,c("decimalLongitude", "decimalLatitude")],
-                                      richness_loc)
-projection(richness_sp) <-  CRS("+init=epsg:4326")
-```
-
-Seguidamente realizamos una intersección entre capas. Estamos interesados en obtener la tipología de ecosistema para cada plot del inventario forestal. 
-
-```{r, eval=FALSE}
-# See this example
-# https://gis.stackexchange.com/questions/226035/join-spatial-point-data-with-multiple-polygon-data-using-r
-
-# Convert to sf-objects
-richness_sp.sf <- st_as_sf(richness_sp)
-eco_t.sf <- st_as_sf(eco_t)
-
-# Keep all "meuse.sf", sort by row.names(meuse.sf). Default overlay is "intersects".
-aux <- st_join(richness_sp.sf, eco_t.sf[,c('COD_ECOSIS', 'ECOSISTE_1')])
-
-# Convert back to Spatial*
-richness_sp_eco <- as(aux, "Spatial")
-```
-
-Vamos a reagrupar los ecosistemas 
-
-```{r, eval=FALSE}
-aux <- aux %>% mutate(newECO = recode_factor(COD_ECOSIS, 
-                                                    `8`="Pine plantations",
-                                                    `2`="High-mountain meadows",
-                                                    `3`="High-mountain shrubland",
-                                                    `5`="Mid-mountain shrubland",
-                                                    `1`="Pastures",
-                                                    `6`="Aquatic systems", 
-                                                    `NA`="NA", 
-                                                    .default = 'Natural Forests'))
-```
-
-
-Finalmente computamos los valores de riqueza por ecosistemas y por agregados 
-
-```{r, eval=FALSE}
-richSinfo <- aux %>%
-  group_by(ECOSISTE_1, COD_ECOSIS) %>%
-  summarise(mean = mean(rich),
-            sd = sd(rich),
-            se = sd/sqrt(length(rich)),
-            n = length(rich),
-            min = min(rich),
-            max = max(rich),
-            median = median(rich)) %>%
-    as.data.frame() %>%
-  dplyr::select(-geometry) 
-```
-
-```{r, eval=FALSE}
-richSinfo_agg <- aux %>%
-  group_by(newECO) %>%
-  summarise(mean = mean(rich),
-            sd = sd(rich),
-            se = sd/sqrt(length(rich)),
-            n = length(rich),
-            min = min(rich),
-            max = max(rich), 
-            median = median(rich)) %>%
-  as.data.frame() %>%
-  dplyr::select(-geometry) 
-
-```
-
-
-
-En [@GomezAparicio2009] se analizan el mismo dataset, y se obtienen, tras aplicar los modelos, los siguientes resultados:
-
-
-```{r, eval=FALSE}
-richPot <- data.frame(cbind(
-  eco = c('Plantations', 'Quercus ilex forests', 'Natural deciduous forests'),
-  n = c(442, 45, 26),
-  potRich = c(13.09, 14.92, 17.55),
-  lowerInterval = c(12.82, 13.72, 15.62), 
-  upperInterval = c(13.34, 16.11, 19.66)))
-
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Conclusiones
-
-Texto.
-
-
-# Agradecimientos
-
-LIFEADAPTAMED?  
-ECOPOTENTIAL? 
-Convenio OBSNEV?
-
-
-
-
-
-
-###### REFERENCIAS
-
-```{r write_citations, cache=FALSE, include=FALSE}
-write.bibtex(file = "knitcitations.bib")
-```
-
-<div id = "refs"></div>
 
 
 
@@ -354,6 +114,19 @@ library("knitr")
 kable(head(iris))
 ```
 
+
+| Ranking | Revista                                                                                                  | Factor de Impacto 2017 (JCR, Clarivate Analytics, 2018) | Tipo de artículo principal | Obligatoriedad de la política de datos | URLs útiles (criterios de repositorio)                                                                                                                                | URLs útiles (política de datos)                                                                                                                             |
+|---------|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------|----------------------------|----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1       | [TRENDS IN ECOLOGY & EVOLUTION](https://www.cell.com/trends/ecology-evolution/home)                      | 15,938                                                  | Review                     |                                        |                                                                                                                                                                       |                                                                                                                                                             |
+| 2       | [Annual Review of Ecology Evolution and Systematics](https://www.annualreviews.org/journal/ecolsys)      | 10,16                                                   | Review                     |                                        |                                                                                                                                                                       |                                                                                                                                                             |
+| 3       | [ISME Journal](https://www.nature.com/ismej/)                                                            | 9,52                                                    | Research                   | 3                                      | [Repositorios recomendados por Springer Nature](https://www.springernature.com/gp/authors/research-data-policy/repositories/12327124)                                 | [Política de datos de investigación](https://www.nature.com/documents/aj-research-data-policy-type-2.pdf)                                                   |
+| 4       | [ECOLOGY LETTERS](https://onlinelibrary.wiley.com/journal/14610248)                                      | 9,137                                                   | Research                   | 1                                      | [Normas para los autores-Archivo de datos](https://onlinelibrary.wiley.com/page/journal/14610248/homepage/forauthors.html#tips18)                                     | [Política de intercambio de datos de Wiley](https://authorservices.wiley.com/author-resources/Journal-Authors/open-access/data-sharing-citation/index.html) |
+| 5       | [GLOBAL CHANGE BIOLOGY](https://onlinelibrary.wiley.com/journal/13652486)                                | 8,997                                                   | Research                   | 2                                      |                                                                                                                                                                       | [Normas para los autores-Intercambio de datos y accesibilidad](https://onlinelibrary.wiley.com/page/journal/13652486/homepage/forauthors.html)              |
+| 6       | [FRONTIERS IN ECOLOGY AND THE ENVIRONMENT](https://esajournals.onlinelibrary.wiley.com/journal/15409309) | 8,302                                                   | Communication              |                                        |                                                                                                                                                                       |                                                                                                                                                             |
+| 7       | [ECOLOGICAL MONOGRAPHS](https://esajournals.onlinelibrary.wiley.com/journal/15577015)                    | 7,828                                                   | Research                   | 1                                      | [Normas para los autores-Política de datos](https://esajournals.onlinelibrary.wiley.com/hub/journal/15577015/resources/author-guidelines-ecm#Submission_Requirements) | [Política de disponibilidad de datos](https://esajournals.onlinelibrary.wiley.com/hub/journal/15577015/resources/data-availability-policy-ecm)              |
+| 8       | [Molecular Ecology Resources](https://onlinelibrary.wiley.com/journal/17550998)                          | 7,059                                                   | Resource                   |                                        |                                                                                                                                                                       |                                                                                                                                                             |
+| 9       | [Methods in Ecology and Evolution](https://besjournals.onlinelibrary.wiley.com/journal/2041210x)         | 6,363                                                   | Research                   | 1                                      | [Política de datos y repositorios comunes](https://besjournals.onlinelibrary.wiley.com/hub/data_archiving_policy)                                                     |                                                                                                                                                             |
+| 10      | [MOLECULAR ECOLOGY](https://onlinelibrary.wiley.com/journal/1365294x)                                    | 6,131                                                   | Research                   | 1                                      | [Normas para los autores-Accesibilidad, almacenamiento y documentación de datos](https://onlinelibrary.wiley.com/page/journal/1365294x/homepage/forauthors.html)      |                                                                                                                                                             |
 
 
 
