@@ -1,0 +1,62 @@
+---
+output:
+  word_document:
+    reference_docx: ../../templates/template_tables_portrait.docx
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(pander)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(flextable)
+library(officer)
+library(here)
+library(xlsx)
+library(ReporteRs)
+```
+
+```{r}
+d <- read.xlsx(file=here("data", "Table_1.xlsx"), "t1")
+
+
+names(d)
+
+
+
+t1 <- regulartable(d)
+
+t1 <- t1 %>% set_header_labels(values = list(
+  "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018." = "Factor de Impacto ^1",
+  "Tipo.de.artículo.principal" = "Tipo de Artículo Principal",
+  "Obligatoriedad.de.la.política.de.datos" = "Obligatoriedad de la política de datos",
+  "URLs.útiles..criterios.de.repositorio." = "URL's útiles. Criterios de repositorio",
+  "URLs.útiles..política.de.datos." = "URL's útiles. Política de datos"
+  ))
+
+
+t1 %>% display(col_key = "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018.", 
+               
+               
+               pattern = "{{mpg}} {{my_message}}", part = "header",
+           formatters = list(mpg ~ "Miles/(US) gallon", 
+                             my_message ~ sprintf("* with num of carb.") ), 
+              fprops = list(my_message = fp_text(color = "gray", vertical.align = "superscript")
+                            )
+  ) %>% autofit()
+
+tabwid(myft)
+               )
+
+```
+
+
+
