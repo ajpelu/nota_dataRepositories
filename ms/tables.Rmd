@@ -37,9 +37,57 @@ t1 <- t1 %>% set_header_labels(values = list(
   "URLs.útiles..política.de.datos." = "URL's útiles. Política de datos"
   ))
 
-t1
+t1 
 
-kable(t1)
+
+
+
+d1 <- d %>% 
+  separate(Revista, c("Revista", "Revista_href"), sep = "]") %>%
+  separate(URLs.útiles..criterios.de.repositorio., c("CriterioRepo", "CriterioRepo_href"), sep = "]") %>% 
+  separate(URLs.útiles..política.de.datos., c("pd", "pd_href"), sep = "]") %>% 
+  mutate(Revista = str_sub(Revista, 2)) %>% 
+  mutate(CriterioRepo = str_sub(CriterioRepo, 2)) %>% 
+  mutate(pd = str_sub(pd, 2)) %>% 
+  mutate(Revista_href = str_sub(Revista_href, 2, -2)) %>% 
+  mutate(CriterioRepo_href = str_sub(CriterioRepo_href, 2, -2)) %>% 
+  mutate(pd_href = str_sub(pd_href, 2, -2))  
+  
+
+t1 <- flextable(d1)
+tabla1 <- t1 %>% 
+  compose(j = "Revista", value = as_paragraph(hyperlink_text(x=Revista, url = Revista_href))) %>% 
+  compose(j = "CriterioRepo", value = as_paragraph(hyperlink_text(x=CriterioRepo, url = CriterioRepo_href))) %>% 
+  compose(j = "pd", value = as_paragraph(hyperlink_text(x=pd, url = pd_href))) 
+
+
+tabla1
+
+
+tabla <- display(tabla1, col_key = c("Ranking", "Revista", "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018.",
+                         "Obligatoriedad.de.la.política.de.datos", "CriterioRepo", "pd"))
+
+%>% 
+  display(col_keys = c("Ranking", "Revista", "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018.",
+                         "Obligatoriedad.de.la.política.de.datos", "CriterioRepo", "pd"))
+  
+              
+  set_header_labels(values = list(
+  "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018." = "Factor de Impacto ^1",
+  "Tipo.de.artículo.principal" = "Tipo de Artículo Principal",
+  "Obligatoriedad.de.la.política.de.datos" = "Obligatoriedad de la política de datos",
+  "URLs.útiles..criterios.de.repositorio." = "URL's útiles. Criterios de repositorio",
+  "URLs.útiles..política.de.datos." = "URL's útiles. Política de datos"
+  )) %>% 
+
+
+
+
+
+
+tabla1
+
+  
 ```
 
 
