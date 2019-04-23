@@ -21,16 +21,11 @@ library(flextable)
 library(officer)
 library(here)
 library(xlsx)
-library(ReporteRs)
+# library(ReporteRs)
 ```
 
 ```{r}
 d <- read.xlsx(file=here("data", "Table_1.xlsx"), "t1")
-
-
-names(d)
-
-
 
 t1 <- regulartable(d)
 
@@ -42,21 +37,9 @@ t1 <- t1 %>% set_header_labels(values = list(
   "URLs.útiles..política.de.datos." = "URL's útiles. Política de datos"
   ))
 
-
-t1 %>% display(col_key = "Factor.de.Impacto.2017..JCR..Clarivate.Analytics..2018.", 
-               
-               
-               pattern = "{{mpg}} {{my_message}}", part = "header",
-           formatters = list(mpg ~ "Miles/(US) gallon", 
-                             my_message ~ sprintf("* with num of carb.") ), 
-              fprops = list(my_message = fp_text(color = "gray", vertical.align = "superscript")
-                            )
-  ) %>% autofit()
-
-tabwid(myft)
-               )
-
+t1
 ```
+
 
 
 
