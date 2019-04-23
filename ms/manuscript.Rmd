@@ -20,7 +20,7 @@ editor_options:
 
 > (1) Laboratorio de Ecología, Instituto Interuniversitario de Investigación del Sistema Tierra (IISTA-CEAMA), Universidad de Granada, Avda. del Mediterráneo s/n, Granada 18006, España.
 
-> (2) COMPLETAR 
+> (2) Grupo de Ecología Terrestre, Departamento de Ecología, Universidad de Granada, Facultad de Ciencias, Campus Fuentenueva s/n, 18071, Granada, España
 
 > Autor para correspondencia: A. J. Pérez-Luque [ajperez@ugr.es]
 
@@ -67,9 +67,10 @@ Ir un paso más allá de publicar los datos junto con los metadatos en un reposi
 
 # Aproximación "tradicional" *vs.* Aproximación reproducible. Un ejemplo: diversidad en los bosques de Sierra Nevada. 
 
-Sierra Nevada es una región montañosa situada en el sur de Europa, considerada un hotspot de diversidad vegetal en la cuenca Mediterránea. Alberga 2353 taxones de flora vascular, que constituye el 33.2 % de la flora de España (incluyendo las islas) [@Lorite2016]. En esta región, que cuenta con una larga tradición de seguimiento de los procesos ecológicos a largo plazo [@PerezLuque2016], en el año 2004 se realizó un exhaustivo inventario forestal en 600 parcelas, distribuidas a lo largo de gradientes ecológicos y altitudinales dentro de las masas forestales de Sierra Nevada.  Este inventario, conocido como Sinfonevada [@PerezLuque2014], fue utilizado por diversos investigadores para avanzar en el campo de la ecología de las repoblaciones (Apéndice 1). 
+Sierra Nevada es una región montañosa situada en el sur de Europa, considerada un hotspot de diversidad vegetal en la cuenca Mediterránea. Alberga 2353 taxones de flora vascular, que constituye el 33.2 % de la flora de España (incluyendo las islas) [@Lorite2016]. En esta región, que cuenta con una larga tradición de seguimiento de los procesos ecológicos a largo plazo [@PerezLuque2016], en el año 2004 se realizó un exhaustivo inventario forestal en 600 parcelas, distribuidas a lo largo de gradientes ecológicos y altitudinales. Este inventario, conocido como Sinfonevada [@PerezLuque2014], fue utilizado por diversos investigadores para avanzar en el campo de la ecología de las repoblaciones (Apéndice 1), identificando los factores ecológicos clave que afectan a la regeneración natural bajo repoblaciones de coníferas, como por ejemplo: la proximidad a la fuente semillera, las características intrínsecas de la plantación o la importancia del uso del suelo previo a la repoblación [@GomezAparicio2009; @GonzlezMoreno2011; @NavarroGonzlez2013]. 
+ 
+Inicialmente, este conjunto de datos se utilizó siguiendo una aproximación que hemos denominado "tradicional" respecto al manejo de los datos. Esto es, se llevó a cabo un análisis de los datos del inventario forestal (parte de ellos o en su totalidad) para testar algunas hipótesis y publicar los resultados en alguna revista científica, añadiendo los datos como material suplementario. Esta aproximación en el tratamiento del conjunto de datos se limitó al depósito como material suplementario; y aunque se mejoró el acceso potencial a dichos datos (179 citas de los tres trabajos que ha utilizado directamente parte de este conjunto de datos) (Figura 3a) su utilización estaba limitada por la escasa documentación sobre dicho inventario, que aparecía a lo sumo dispersa y no estructurada.
 
-Inicialmente, este conjunto de datos se utilizó siguiendo una aproximación que hemos denominado "tradicional" respecto al manejo de los datos. Esto es, se llevó a cabo un análisis de los datos del inventario forestal (parte de ellos o en su totalidad) para testar algunas hipótesis y publicar los resultados en alguna revista científica, añadiendo los datos como material suplementario. En efecto, la utilización de este conjunto de datos ha servido para identificar los factores ecológicos clave que afectan a la regeneración natural bajo repoblaciones de coníferas, como la proximidad a la fuente semillera, las características intrínsecas de la plantación o la importancia del uso del suelo previo a la repoblación [@GomezAparicio2009; @GonzlezMoreno2011; @NavarroGonzlez2013]. Esta aproximación en el tratamiento del conjunto de datos se limitó al depósito como material suplementario; y aunque se mejoró el acceso potencial a dichos datos (179 citas de los tres trabajos que ha utilizado directamente parte de este conjunto de datos) (Figura 3a) su utilización estaba limitada por la escasa documentación sobre dicho inventario, que aparecía a lo sumo dispersa y no estructurada. 
 Para mejorar el acceso a dicho conjunto de datos, se llevó a cabo una aproximación que complementa el uso de los datos, añadiendo más valor a los mismos, y aumentando la posibilidad de reutilización del conjunto original de datos, para otros fines diferentes del propósito inicial. Esta aproximación "reproducible" consistió en la normalización del inventario forestal y su posterior integración en repositorios de datos (Figura 3b). Para ello se realizó una documentación del conjunto de datos que permite conocer todos los detalles de los datos (desde su génesis hasta su “cocinado”), y posteriormente se integró en un repositorio local. Además, para poder integrarlo en iniciativas internacionales y que otros investigadores pudieran conocer el conjunto de datos, se utilizó un estándar de documentación (EML y Darwin Core). De tal forma que el conjunto de datos inicial, una vez normalizado y documentado de acuerdo a un estándar de metadatos, está disponible en repositorios internacionales, y puede ser utilizado para fines diferentes. En nuestro ejemplo, el conjunto de datos Sinfonevada integrado en GBIF, ha sido citado 36 veces, y lo más interesante es que se ha descargado (total o parcialmente) más de 11267 veces (Figura 3d), aumentando en varios órdenes de magnitud el uso inicial de dicho conjunto de datos. Además de la inclusión del conjunto de datos en un repositorio institucional, se consideró complementario la opción de una descripción detallada del conjunto de datos, para lo cual se realizó un Data Paper, que tras un proceso de revisión se publicó en una revista indexada (Figura 3c).
 
 A nuestro entender, esta forma de compartir datos (ecológicos o de otras disciplinas), conlleva una serie de beneficios, entre los que destacamos: 
@@ -92,6 +93,7 @@ Los autores agradecen al grupo de Ecoinformática por la revisión de la Nota, y
 
 # Referencias
 
+<div id="refs"></div>
 
 ###### TABLA 1
 
@@ -99,9 +101,6 @@ Los autores agradecen al grupo de Ecoinformática por la revisión de la Nota, y
 
 **Table 1.** Data sharing requirements of the journals with the greatest impact on Ecology. A search of journals by rank using Web of Science (2019/01/23) and data policy review for those whose main publication is the research article. 
 
-```{r child = 'tables.Rmd'}
-```
- 
 
 ###### TABLA 2
 
@@ -120,10 +119,16 @@ Los autores agradecen al grupo de Ecoinformática por la revisión de la Nota, y
 
 ###### FIGURA 1
 
-![Caption for the picture.](/path/to/image.png)]
+![](../fig/figure_Repro.png)
+
+###### FIGURA 2
+
+![](../fig/figure_2.jpg)
+
+###### FIGURA 3
+
+![](../fig/figure_3.jpg)
 
 
-
-
-
-![](../fig/figure_Repro.png){height=750px}
+```{r child = 'apendice1.Rmd'}
+```

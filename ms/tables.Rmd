@@ -1,7 +1,7 @@
 ---
 output:
   word_document:
-    reference_docx: ../../templates/template_tables_portrait.docx
+    reference_docx: ../templates/template_tables_portrait.docx
 editor_options: 
   chunk_output_type: console
 ---
@@ -38,6 +38,8 @@ t1 <- t1 %>% set_header_labels(values = list(
   ))
 
 t1
+
+kable(t1)
 ```
 
 
