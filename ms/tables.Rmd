@@ -20,7 +20,6 @@ library(dplyr)
 library(flextable)
 library(officer)
 library(here)
-library(xlsx)
 library(openxlsx)
 # library(ReporteRs)
 ```
@@ -41,8 +40,18 @@ d1 <- d %>%
 
 
 
-t1 <- flextable(d1, col_keys = c("Revista", "Ranking","Revista_href"))
-tabla1 <- compose(t1, j = 1, value = as_paragraph(hyperlink_text(x= Revista, url = Revista_href))) 
+t1 <- flextable(d1, col_keys = c("Ranking","Revista","Factor.de.Impacto.2017.(JCR,.Clarivate.Analytics,.2018)",                          "Tipo.de.artículo.principal","Obligatoriedad.de.la.política.de.datos",
+                                 "CriterioRepo", "pd"))
+tabla1 <- compose(t1, j = "Revista", value = as_paragraph(hyperlink_text(x= Revista, url = Revista_href))) 
+
+tabla1 <- compose(tabla1, j = "CriterioRepo", value = as_paragraph(hyperlink_text(x="CriterioRepo", url = "CriterioRepo_href"))) 
+
+
+  compose(j = "pd", value = as_paragraph(hyperlink_text(x="pd", url = "pd_href"))) 
+
+
+
+tabla1 <- flextable(tabla1, col_keys = c("Ranking","Revista"))
 
 
 
@@ -103,8 +112,6 @@ tabla1 <- t1 %>%
 
 
 %>% 
-  compose(j = "CriterioRepo", value = as_paragraph(hyperlink_text(x="CriterioRepo", url = "CriterioRepo_href"))) %>% 
-  compose(j = "pd", value = as_paragraph(hyperlink_text(x="pd", url = "pd_href"))) 
 
 
 tabla1
