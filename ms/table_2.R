@@ -58,6 +58,6 @@ t2 <- set_header_labels(t2,
 t2 <- bold(t2, j = "Revista", i = ~ d2$rd == "Si", bold = TRUE, part = "body")
 t2
 
-doc <- read_docx(path = here::here("/templates/template_tables_portrait.docx"))
+doc <- read_docx(path = here::here("ms/template_tables_portrait.docx"))
 doc <- body_add_flextable(doc, value = t2) 
 print(doc, target = here::here("ms/tables2.docx"))

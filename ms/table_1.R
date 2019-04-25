@@ -53,6 +53,6 @@ t1 <- colformat_num(t1, col_keys = "Ranking", digits = 0)
 t1 <- autofit(t1) 
 
 
-doc <- read_docx(path = here::here("/templates/template_tables_portrait.docx"))
+doc <- read_docx(path = here::here("ms/template_tables_portrait.docx"))
 doc <- body_add_flextable(doc, value = t1) 
 print(doc, target = here::here("ms/tables1.docx"))
